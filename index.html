@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Day 25 of Frontend: Basic Level DOM Manipulation in JavaScript (Selecting Elements, textContent, innerHTML, styles, classList, createElement, appendChild, and addEventListener).">
+    <meta name="description" content="Day 26 of Frontend: Basic Level Asynchronous JavaScript (setTimeout, setInterval, Callbacks, Promises, async/await, fetch API, and Event Loop).">
     <meta name="author" content="Harish (harish-0987)">
-    <title>Day 25 - Basic DOM Manipulation | Harish</title>
+    <title>Day 26 - Asynchronous JavaScript (Basic Level) | Harish</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,194 +20,259 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <div class="badge">Day 25 of 100 Days Frontend</div>
-            <h1>JavaScript <span class="highlight">DOM Manipulation</span></h1>
-            <p class="subtitle">A clean, beginner-friendly introduction to interacting with web pages dynamically using <code>document</code> methods, content updates, styles, dynamic elements, and event listeners.</p>
+            <div class="badge">Day 26 of 100 Days Frontend</div>
+            <h1>Asynchronous <span class="highlight">JavaScript</span></h1>
+            <p class="subtitle">A clean, beginner-friendly exploration of non-blocking code in JavaScript: <code>setTimeout</code>, <code>setInterval</code>, <strong>Callbacks</strong>, <strong>Promises</strong>, <code>async/await</code>, the <code>fetch()</code> API, and the <strong>Event Loop</strong>.</p>
         </header>
 
         <!-- Interactive Playground Grid -->
         <main class="grid">
 
-            <!-- Card 1: Content Manipulation -->
-            <section class="card" id="card-content">
+            <!-- Card 1: Timers (setTimeout & setInterval) -->
+            <section class="card" id="card-timers">
                 <div class="card-header">
-                    <span class="card-tag">1. Content Manipulation</span>
-                    <h2>textContent vs innerHTML</h2>
+                    <span class="card-tag">1. Timers &amp; Delays</span>
+                    <h2>setTimeout &amp; setInterval</h2>
                 </div>
-                <p class="card-desc"><code>textContent</code> handles raw text safely; <code>innerHTML</code> parses and renders HTML tags inside elements.</p>
+                <p class="card-desc">JavaScript is single-threaded, but browser Web APIs let us run code after delays or periodically without freezing the page.</p>
                 
                 <div class="card-body">
-                    <label>Target Element Preview:</label>
-                    <div class="target-box" id="content-target">Initial Target Text</div>
-
-                    <label for="content-input">New Message:</label>
-                    <div class="input-group">
-                        <input type="text" id="content-input" value="JavaScript DOM is interactive!">
-                    </div>
-
+                    <!-- setTimeout section -->
+                    <label>Demo A: Delayed Action (<code>setTimeout</code>)</label>
                     <div class="btn-group">
-                        <button onclick="handleTextContentChange()">textContent (Plain)</button>
-                        <button class="btn-secondary" onclick="handleInnerHTMLChange()">innerHTML (HTML Tags)</button>
+                        <button id="btn-start-timeout" onclick="handleStartTimeout()">Start 2-Second Timer</button>
                     </div>
+                    <div class="target-box" id="timeout-display">Status: Idle. Click button to schedule execution.</div>
 
-                    <div class="result-box chips-wrap" id="content-result">Ready...</div>
+                    <!-- setInterval section -->
+                    <label style="margin-top: 14px;">Demo B: Repeating Counter (<code>setInterval</code> &amp; <code>clearInterval</code>)</label>
+                    <div class="btn-group">
+                        <button class="btn-secondary" id="btn-start-interval" onclick="handleStartInterval()">Start Counter</button>
+                        <button class="btn-secondary" id="btn-stop-interval" onclick="handleStopInterval()">Pause</button>
+                        <button class="btn-secondary" id="btn-reset-interval" onclick="handleResetInterval()">Reset</button>
+                    </div>
+                    <div class="result-box chips-wrap" id="interval-display">
+                        <span>Current Count: <strong id="interval-count" class="highlight-num">0</strong> seconds</span>
+                    </div>
                 </div>
 
                 <div class="code-preview">
-<pre><code>const el = document.getElementById("content-target");
-// 1. Plain text (safe from XSS)
-el.textContent = "New text";
+<pre><code>// 1. setTimeout: runs once after delay
+setTimeout(() =&gt; {
+    console.log("Executed after 2000ms");
+}, 2000);
 
-// 2. HTML rendered markup
-el.innerHTML = "&lt;strong&gt;Bold&lt;/strong&gt; text";</code></pre>
+// 2. setInterval: runs repeatedly every X ms
+const id = setInterval(() =&gt; {
+    count++;
+}, 1000);
+
+// 3. clearInterval: stops the repeating timer
+clearInterval(id);</code></pre>
                 </div>
             </section>
 
-            <!-- Card 2: Styles & ClassList -->
-            <section class="card" id="card-styles">
+            <!-- Card 2: Callbacks & Sequential Flow -->
+            <section class="card" id="card-callbacks">
                 <div class="card-header">
-                    <span class="card-tag">2. Styles & Classes</span>
-                    <h2>Inline Styles & classList</h2>
+                    <span class="card-tag">2. Callback Functions</span>
+                    <h2>Callbacks &amp; Asynchronous Flow</h2>
                 </div>
-                <p class="card-desc">Control appearance via <code>element.style</code> properties or toggle CSS classes with <code>element.classList.toggle()</code>.</p>
+                <p class="card-desc">A <strong>callback</strong> is a function passed into another function as an argument, executed after an asynchronous task completes.</p>
                 
                 <div class="card-body">
-                    <label>Target Box:</label>
-                    <div class="target-box" id="style-target">Dynamic Style Box</div>
-
-                    <label>Manipulate Appearance:</label>
+                    <label>Simulate Pizza Ordering Flow (Sequential Callbacks):</label>
                     <div class="btn-group">
-                        <button onclick="handleStyleColor('#38bdf8', 'rgba(56, 189, 248, 0.12)')">Cyan Theme</button>
-                        <button class="btn-success" onclick="handleStyleColor('#10b981', 'rgba(16, 185, 129, 0.12)')">Emerald Theme</button>
-                        <button class="btn-warning" onclick="handleClassToggle()">classList.toggle()</button>
-                        <button class="btn-secondary" onclick="handleStyleReset()">Reset</button>
+                        <button id="btn-run-callbacks" onclick="handlePizzaOrderCallback()">Start Order Pipeline</button>
                     </div>
 
-                    <div class="result-box chips-wrap" id="style-result">Ready...</div>
+                    <div class="target-box" id="callback-steps">
+                        <div class="step-line" id="cb-step-1">1. Waiting to place order...</div>
+                        <div class="step-line" id="cb-step-2">2. Dough preparation pending...</div>
+                        <div class="step-line" id="cb-step-3">3. Baking pending...</div>
+                        <div class="step-line" id="cb-step-4">4. Delivery pending...</div>
+                    </div>
+
+                    <div class="result-box chips-wrap" id="callback-result">Click "Start Order Pipeline" to watch callbacks run in sequence.</div>
                 </div>
 
                 <div class="code-preview">
-<pre><code>const box = document.getElementById("style-target");
-// Change style
-box.style.color = "#38bdf8";
+<pre><code>function placeOrder(callback) {
+    setTimeout(() =&gt; {
+        console.log("Order placed");
+        callback(); // Invokes next step
+    }, 800);
+}
 
-// Toggle class
-box.classList.toggle("highlight-active");</code></pre>
+// Chained callbacks ("Callback Hell" if too deep):
+placeOrder(() =&gt; {
+    bakeCrust(() =&gt; {
+        deliverPizza();
+    });
+});</code></pre>
                 </div>
             </section>
 
-            <!-- Card 3: Create & Remove Elements -->
-            <section class="card" id="card-elements">
+            <!-- Card 3: Promises -->
+            <section class="card" id="card-promises">
                 <div class="card-header">
-                    <span class="card-tag">3. Dynamic Elements</span>
-                    <h2>createElement & appendChild</h2>
+                    <span class="card-tag">3. Promises</span>
+                    <h2>States: Pending, Fulfilled &amp; Rejected</h2>
                 </div>
-                <p class="card-desc">Create elements in memory, configure attributes, append them to the DOM, or remove them on the fly.</p>
+                <p class="card-desc">A <strong>Promise</strong> is an object representing the eventual completion or failure of an asynchronous operation.</p>
                 
                 <div class="card-body">
-                    <label>Live Element Container:</label>
-                    <div class="target-box" id="dynamic-container" style="min-height: 52px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center;"></div>
-
-                    <label for="element-label-input">Element Label:</label>
-                    <div class="input-group">
-                        <input type="text" id="element-label-input" placeholder="e.g. New Task" value="DOM Task">
-                    </div>
-
+                    <label>Simulate Promise Action:</label>
                     <div class="btn-group">
-                        <button onclick="handleAddElement()">createElement() + append</button>
-                        <button class="btn-danger" onclick="handleRemoveElement()">remove() Last</button>
-                        <button class="btn-secondary" onclick="handleClearElements()">Clear All</button>
+                        <button onclick="handlePromiseDemo('success')">Resolve (Success)</button>
+                        <button class="btn-secondary" onclick="handlePromiseDemo('error')">Reject (Error)</button>
+                        <button class="btn-secondary" onclick="handlePromiseDemo('random')">Random (50/50)</button>
                     </div>
 
-                    <div class="result-box chips-wrap" id="dynamic-result">Ready...</div>
-                </div>
-
-                <div class="code-preview">
-<pre><code>// 1. Create element
-const chip = document.createElement("span");
-chip.textContent = "New Item";
-
-// 2. Append to parent
-container.appendChild(chip);
-
-// 3. Remove element
-chip.remove();</code></pre>
-                </div>
-            </section>
-
-            <!-- Card 4: Attribute Manipulation -->
-            <section class="card" id="card-attributes">
-                <div class="card-header">
-                    <span class="card-tag">4. Attributes</span>
-                    <h2>setAttribute & getAttribute</h2>
-                </div>
-                <p class="card-desc">Inspect and change HTML tag attributes dynamically, such as input <code>type</code>, <code>placeholder</code>, or <code>src</code>.</p>
-                
-                <div class="card-body">
-                    <label for="attr-input-demo">Target Input Field:</label>
-                    <div class="input-group">
-                        <input type="password" id="attr-input-demo" value="SuperSecretPassword123" placeholder="Enter password...">
-                    </div>
-
-                    <div class="btn-group">
-                        <button id="btn-toggle-type" onclick="handleToggleInputType()">Show as Text</button>
-                        <button class="btn-secondary" onclick="handlePlaceholderChange()">Change Placeholder</button>
-                    </div>
-
-                    <div class="result-box chips-wrap" id="attr-result">Ready...</div>
-                </div>
-
-                <div class="code-preview">
-<pre><code>const input = document.getElementById("attr-input-demo");
-
-// Get and Set attribute
-const current = input.getAttribute("type");
-input.setAttribute("type", "text");
-input.setAttribute("placeholder", "New text...");</code></pre>
-                </div>
-            </section>
-
-            <!-- Card 5: Event Listeners -->
-            <section class="card" id="card-events" style="grid-column: 1 / -1;">
-                <div class="card-header">
-                    <span class="card-tag">5. Event Listeners</span>
-                    <h2>addEventListener (Click & Input)</h2>
-                </div>
-                <p class="card-desc">Attach listeners to react immediately when users click buttons, type into text fields, or move the mouse.</p>
-                
-                <div class="card-body">
-                    <div class="input-row">
-                        <!-- Part A: Click Event -->
-                        <div class="input-col">
-                            <label>Click Event Demo:</label>
-                            <div class="btn-group">
-                                <button id="btn-click-tracker">Click Me!</button>
-                                <span class="step-chip" id="click-counter-display">0 clicks</span>
-                            </div>
+                    <div class="target-box status-card" id="promise-target">
+                        <div class="status-row">
+                            <span class="status-label">Promise State:</span>
+                            <span class="badge-status badge-idle" id="promise-badge">IDLE</span>
                         </div>
-
-                        <!-- Part B: Real-time Input Event -->
-                        <div class="input-col">
-                            <label for="live-mirror-input">Real-time "input" Event Demo:</label>
-                            <input type="text" id="live-mirror-input" placeholder="Type here to mirror live...">
-                            <div class="target-box" id="live-mirror-output" style="margin-top: 8px; margin-bottom: 0;">(Waiting for input...)</div>
-                        </div>
+                        <div class="status-details" id="promise-details">Click a button to create and watch a Promise.</div>
                     </div>
 
-                    <div class="result-box chips-wrap" id="events-result" style="margin-top: 12px;">Waiting for user interaction...</div>
+                    <div class="result-box chips-wrap" id="promise-result">Handled via <code>.then()</code>, <code>.catch()</code>, &amp; <code>.finally()</code></div>
                 </div>
 
                 <div class="code-preview">
-<pre><code>// Click Listener
-btn.addEventListener("click", () => {
-    counter++;
-    counterDisplay.textContent = `${counter} clicks`;
+<pre><code>const myPromise = new Promise((resolve, reject) =&gt; {
+    const success = true;
+    setTimeout(() =&gt; {
+        if (success) resolve("Data loaded! ✅");
+        else reject("Server error! ❌");
+    }, 1000);
 });
 
-// Input Listener (real-time typing)
-input.addEventListener("input", (event) => {
-    output.textContent = event.target.value;
-});</code></pre>
+myPromise
+    .then(result =&gt; console.log(result))
+    .catch(error =&gt; console.error(error))
+    .finally(() =&gt; console.log("Promise finished."));</code></pre>
+                </div>
+            </section>
+
+            <!-- Card 4: Async / Await -->
+            <section class="card" id="card-async-await">
+                <div class="card-header">
+                    <span class="card-tag">4. Async / Await</span>
+                    <h2>Clean Syntax with try...catch</h2>
+                </div>
+                <p class="card-desc"><code>async</code> and <code>await</code> make asynchronous promise-based code read and write like regular synchronous code.</p>
+                
+                <div class="card-body">
+                    <label>Simulated Async User Fetch:</label>
+                    <div class="btn-group">
+                        <button onclick="handleAsyncAwaitDemo(false)">Fetch User Profile</button>
+                        <button class="btn-secondary" onclick="handleAsyncAwaitDemo(true)">Simulate Failed Fetch</button>
+                    </div>
+
+                    <div class="target-box status-card" id="async-target">
+                        <div class="status-row">
+                            <span class="status-label">Loader Status:</span>
+                            <span class="badge-status badge-idle" id="async-badge">IDLE</span>
+                        </div>
+                        <div class="status-details" id="async-details">Ready to invoke async function.</div>
+                    </div>
+
+                    <div class="result-box chips-wrap" id="async-result">Using <code>await</code> inside an <code>async function</code>.</div>
+                </div>
+
+                <div class="code-preview">
+<pre><code>async function loadUserProfile() {
+    try {
+        console.log("Loading...");
+        const user = await fetchUserData(); // Pauses until resolved
+        console.log("Success:", user.name);
+    } catch (error) {
+        console.error("Caught error:", error.message);
+    } finally {
+        console.log("Cleanup complete.");
+    }
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Card 5: Real-World Fetch API -->
+            <section class="card" id="card-fetch">
+                <div class="card-header">
+                    <span class="card-tag">5. Fetch API</span>
+                    <h2>HTTP Requests &amp; JSON Data</h2>
+                </div>
+                <p class="card-desc">The modern built-in <code>fetch()</code> API requests resources across the network and returns a Promise that resolves with a Response.</p>
+                
+                <div class="card-body">
+                    <label>Fetch Live Data from Public API:</label>
+                    <div class="btn-group">
+                        <button id="btn-fetch-quote" onclick="handleFetchQuote()">Fetch Random Quote</button>
+                        <button class="btn-secondary" id="btn-fetch-todo" onclick="handleFetchTodo()">Fetch Sample Todo</button>
+                    </div>
+
+                    <div class="target-box status-card" id="fetch-target">
+                        <div class="status-row">
+                            <span class="status-label">HTTP Status:</span>
+                            <span class="badge-status badge-idle" id="fetch-badge">READY</span>
+                        </div>
+                        <div class="status-details" id="fetch-details">Click button to send an HTTP GET request.</div>
+                    </div>
+
+                    <div class="result-box chips-wrap" id="fetch-result">Endpoint response parsed with <code>response.json()</code></div>
+                </div>
+
+                <div class="code-preview">
+<pre><code>async function getQuote() {
+    const response = await fetch("https://dummyjson.com/quotes/random");
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log(data.quote, data.author);
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Card 6: Event Loop & Execution Order -->
+            <section class="card" id="card-event-loop">
+                <div class="card-header">
+                    <span class="card-tag">6. JavaScript Event Loop</span>
+                    <h2>Execution Order: Sync vs Micro vs Macro</h2>
+                </div>
+                <p class="card-desc">See the Event Loop in action! Synchronous code runs first, then Microtasks (Promises), then Macrotasks (<code>setTimeout</code>).</p>
+                
+                <div class="card-body">
+                    <label>Run Event Loop Race:</label>
+                    <div class="btn-group">
+                        <button id="btn-run-race" onclick="handleRunEventLoopRace()">Run Race</button>
+                        <button class="btn-secondary" onclick="handleClearTerminal()">Clear Log</button>
+                    </div>
+
+                    <div class="terminal-box" id="terminal-output">
+                        <div class="terminal-line"><span class="tag-meta">[SYSTEM]</span> Event Loop Terminal ready. Click "Run Race".</div>
+                    </div>
+
+                    <div class="result-box chips-wrap" id="race-result">
+                        <span class="step-chip">1. Call Stack (Sync)</span>
+                        <span class="step-chip">2. Microtasks (Promise)</span>
+                        <span class="step-chip">3. Macrotasks (Timer)</span>
+                    </div>
+                </div>
+
+                <div class="code-preview">
+<pre><code>console.log("1. Synchronous Start");
+
+setTimeout(() =&gt; {
+    console.log("4. Macrotask (setTimeout 0ms)");
+}, 0);
+
+Promise.resolve().then(() =&gt; {
+    console.log("3. Microtask (Promise.then)");
+});
+
+console.log("2. Synchronous End");</code></pre>
                 </div>
             </section>
 
@@ -215,8 +280,8 @@ input.addEventListener("input", (event) => {
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Day 25 of 100 Days Frontend • Built by <a href="https://github.com/harish-0987" target="_blank" rel="noopener">Harish</a></p>
-            <p><a href="https://github.com/harish-0987/DAY-25-OF-FRONTEND" target="_blank" rel="noopener" class="repo-link">View on GitHub ↗</a></p>
+            <p>Day 26 of 100 Days Frontend • Built by <a href="https://github.com/harish-0987" target="_blank" rel="noopener">Harish</a></p>
+            <p><a href="https://github.com/harish-0987/DAY-26-OF-FRONTEND" target="_blank" rel="noopener" class="repo-link">View on GitHub ↗</a></p>
         </footer>
     </div>
 

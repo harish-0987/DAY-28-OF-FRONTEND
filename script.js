@@ -1,311 +1,439 @@
 // ======================================================
-// Day 25: Basic Level DOM Manipulation in JavaScript
+// Day 26: Basic Level Asynchronous JavaScript
 // 100 Days Frontend Challenge by Harish (@harish-0987)
 // ======================================================
 
 // ------------------------------------------------------
-// 1. SELECTING & MODIFYING CONTENT (textContent vs innerHTML)
+// 1. TIMERS: setTimeout & setInterval
 // ------------------------------------------------------
 
-// textContent: Safely sets plain text (does not parse HTML)
-function setElementText(elementId, text) {
-    const el = document.getElementById(elementId);
-    if (el) {
-        el.textContent = text;
+let timeoutTimerId = null;
+let intervalTimerId = null;
+let intervalCounterSeconds = 0;
+
+/**
+ * setTimeout demo: Executes a function once after a specified delay.
+ */
+function handleStartTimeout() {
+    const display = document.getElementById("timeout-display");
+    const button = document.getElementById("btn-start-timeout");
+
+    if (timeoutTimerId) {
+        clearTimeout(timeoutTimerId);
+    }
+
+    button.disabled = true;
+    display.textContent = "⏳ Timer scheduled! Executing in 2 seconds...";
+    display.style.borderColor = "#f59e0b";
+    display.style.color = "#fbbf24";
+
+    const startTime = Date.now();
+
+    // Browser Web API setTimeout
+    timeoutTimerId = setTimeout(() => {
+        const elapsedMs = Date.now() - startTime;
+        display.textContent = `✅ Executed callback! Elapsed time: ${(elapsedMs / 1000).toFixed(2)}s`;
+        display.style.borderColor = "#10b981";
+        display.style.color = "#6ee7b7";
+        button.disabled = false;
+        timeoutTimerId = null;
+    }, 2000);
+}
+
+/**
+ * setInterval demo: Starts a repeating timer every 1000ms.
+ */
+function handleStartInterval() {
+    if (intervalTimerId !== null) return; // Already running
+
+    const countElement = document.getElementById("interval-count");
+    
+    intervalTimerId = setInterval(() => {
+        intervalCounterSeconds++;
+        countElement.textContent = intervalCounterSeconds;
+    }, 1000);
+}
+
+/**
+ * clearInterval demo: Pauses the active interval.
+ */
+function handleStopInterval() {
+    if (intervalTimerId !== null) {
+        clearInterval(intervalTimerId);
+        intervalTimerId = null;
     }
 }
 
-// innerHTML: Parses and renders HTML markup
-function setElementHTML(elementId, htmlString) {
-    const el = document.getElementById(elementId);
-    if (el) {
-        el.innerHTML = htmlString;
+/**
+ * Resets interval counter to zero.
+ */
+function handleResetInterval() {
+    handleStopInterval();
+    intervalCounterSeconds = 0;
+    const countElement = document.getElementById("interval-count");
+    if (countElement) {
+        countElement.textContent = "0";
     }
 }
 
 // ------------------------------------------------------
-// 2. MODIFYING STYLES & CSS CLASSES (style & classList)
+// 2. CALLBACKS: Sequential Asynchronous Flow
 // ------------------------------------------------------
 
-// Inline style modification
-function setBoxColor(elementId, color, bgColor) {
-    const el = document.getElementById(elementId);
-    if (el) {
-        el.style.color = color;
-        el.style.backgroundColor = bgColor;
-        el.style.borderColor = color;
-    }
-}
+/**
+ * Simulates multi-step workflow using traditional callbacks.
+ */
+function handlePizzaOrderCallback() {
+    const btn = document.getElementById("btn-run-callbacks");
+    const resultBox = document.getElementById("callback-result");
+    const step1 = document.getElementById("cb-step-1");
+    const step2 = document.getElementById("cb-step-2");
+    const step3 = document.getElementById("cb-step-3");
+    const step4 = document.getElementById("cb-step-4");
 
-// classList manipulation (add, remove, toggle, contains)
-function toggleBoxHighlight(elementId, className = "highlight-active") {
-    const el = document.getElementById(elementId);
-    if (el) {
-        el.classList.toggle(className);
-        return el.classList.contains(className);
-    }
-    return false;
-}
+    btn.disabled = true;
 
-// ------------------------------------------------------
-// 3. CREATING & REMOVING ELEMENTS (createElement, appendChild, remove)
-// ------------------------------------------------------
-
-let elementCounter = 0;
-
-// createElement & appendChild: Creates a new element and adds to container
-function createAndAppendChip(containerId, labelText) {
-    const container = document.getElementById(containerId);
-    if (!container) return null;
-
-    elementCounter++;
-    const newChip = document.createElement("span");
-    newChip.className = "dynamic-item";
-    newChip.textContent = `#${elementCounter} ${labelText}`;
-    newChip.setAttribute("data-id", elementCounter);
-
-    // Optional: Clicking on the chip directly removes it
-    newChip.addEventListener("click", () => {
-        newChip.remove();
-        updateElementCountDisplay();
+    // Reset steps display
+    [step1, step2, step3, step4].forEach((s, idx) => {
+        s.className = "step-line";
+        s.textContent = `${idx + 1}. Pending...`;
     });
 
-    container.appendChild(newChip);
-    return newChip;
-}
+    resultBox.textContent = "Order pipeline initiated via callbacks...";
 
-// removeChild / remove: Removes the last child element
-function removeLastChildElement(containerId) {
-    const container = document.getElementById(containerId);
-    if (container && container.lastElementChild) {
-        const removedText = container.lastElementChild.textContent;
-        container.lastElementChild.remove();
-        return removedText;
-    }
-    return null;
-}
+    // Step 1: Place Order
+    step1.className = "step-line active";
+    step1.textContent = "1. Placing order with restaurant...";
 
-// Clear all dynamically created elements
-function clearContainerChildren(containerId) {
-    const container = document.getElementById(containerId);
-    if (container) {
-        container.innerHTML = "";
-        elementCounter = 0;
-    }
+    setTimeout(() => {
+        step1.className = "step-line completed";
+        step1.textContent = "1. Order Placed! (800ms) ✅";
+
+        // Step 2 Callback: Prepare Dough
+        step2.className = "step-line active";
+        step2.textContent = "2. Preparing fresh dough & sauce...";
+
+        setTimeout(() => {
+            step2.className = "step-line completed";
+            step2.textContent = "2. Dough Prepared! (800ms) ✅";
+
+            // Step 3 Callback: Bake in Oven
+            step3.className = "step-line active";
+            step3.textContent = "3. Baking in wood-fired oven...";
+
+            setTimeout(() => {
+                step3.className = "step-line completed";
+                step3.textContent = "3. Pizza Baked Crispy! (800ms) ✅";
+
+                // Step 4 Callback: Deliver
+                step4.className = "step-line active";
+                step4.textContent = "4. Handing over to delivery rider...";
+
+                setTimeout(() => {
+                    step4.className = "step-line completed";
+                    step4.textContent = "4. Delivered Hot & Fresh! (800ms) 🍕🎉";
+                    resultBox.textContent = "All 4 asynchronous callbacks completed in sequence!";
+                    btn.disabled = false;
+                }, 800);
+
+            }, 800);
+
+        }, 800);
+
+    }, 800);
 }
 
 // ------------------------------------------------------
-// 4. ATTRIBUTE MANIPULATION (setAttribute, getAttribute)
+// 3. PROMISES: new Promise, .then(), .catch(), .finally()
 // ------------------------------------------------------
 
-function toggleInputAttributeType(inputId) {
-    const input = document.getElementById(inputId);
-    if (!input) return "text";
-
-    const currentType = input.getAttribute("type");
-    const newType = currentType === "password" ? "text" : "password";
-    input.setAttribute("type", newType);
-    return newType;
-}
-
-function changePlaceholderAttribute(inputId, newPlaceholder) {
-    const input = document.getElementById(inputId);
-    if (input) {
-        input.setAttribute("placeholder", newPlaceholder);
-        return input.getAttribute("placeholder");
-    }
-    return null;
-}
-
-// ======================================================
-// DOM UI Handlers for Interactive Playground
-// ======================================================
-
-// Helper: Render status chips in result box
-function renderChips(containerId, items, isSuccess = true) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    container.className = isSuccess ? "result-box success chips-wrap" : "result-box error";
-    container.innerHTML = "";
-
-    if (typeof items === "string") {
-        container.textContent = items;
-        return;
-    }
-
-    if (Array.isArray(items)) {
-        items.forEach((text, index) => {
-            const chip = document.createElement("span");
-            chip.className = "step-chip";
-            chip.textContent = text;
-            chip.style.animationDelay = `${index * 40}ms`;
-            container.appendChild(chip);
-        });
-    }
-}
-
-// --- Handler 1: Content Update ---
-function handleTextContentChange() {
-    const customText = document.getElementById("content-input").value || "JavaScript DOM is interactive!";
-    setElementText("content-target", customText);
-
-    renderChips("content-result", [
-        `Used: .textContent = "${customText}"`,
-        `Safety: Plain text (Safe from XSS) 🔒`
-    ], true);
-}
-
-function handleInnerHTMLChange() {
-    const customText = document.getElementById("content-input").value || "JavaScript DOM";
-    const formattedHTML = `✨ <strong>${customText}</strong> (Rendered with <em>HTML tags</em>!)`;
-    setElementHTML("content-target", formattedHTML);
-
-    renderChips("content-result", [
-        `Used: .innerHTML = "<strong>...</strong>"`,
-        `Tags Rendered: <strong> and <em> 🎨`
-    ], true);
-}
-
-// --- Handler 2: Style & ClassList ---
-function handleStyleColor(color, bgColor) {
-    setBoxColor("style-target", color, bgColor);
-    renderChips("style-result", [
-        `style.color = "${color}"`,
-        `style.backgroundColor = "${bgColor}"`
-    ], true);
-}
-
-function handleClassToggle() {
-    const isHighlighted = toggleBoxHighlight("style-target", "highlight-active");
-    renderChips("style-result", [
-        `classList.toggle("highlight-active")`,
-        `Active Status: ${isHighlighted ? "true (Class Applied ✨)" : "false (Class Removed ❌)"}`
-    ], true);
-}
-
-function handleStyleReset() {
-    const box = document.getElementById("style-target");
-    if (box) {
-        box.removeAttribute("style");
-        box.className = "target-box";
-    }
-    renderChips("style-result", "Styles & classes reset to defaults.", true);
-}
-
-// --- Handler 3: Dynamic Elements ---
-function handleAddElement() {
-    const input = document.getElementById("element-label-input");
-    const label = input && input.value.trim() ? input.value.trim() : "DOM Task";
-    
-    const chip = createAndAppendChip("dynamic-container", label);
-    if (chip) {
-        renderChips("dynamic-result", [
-            `document.createElement("span")`,
-            `container.appendChild()`,
-            `Added: "${chip.textContent}" (Click chip to delete)`
-        ], true);
-    }
-}
-
-function handleRemoveElement() {
-    const removed = removeLastChildElement("dynamic-container");
-    if (removed) {
-        renderChips("dynamic-result", [
-            `lastElementChild.remove()`,
-            `Removed: "${removed}"`
-        ], true);
-    } else {
-        renderChips("dynamic-result", "No elements left to remove!", false);
-    }
-}
-
-function handleClearElements() {
-    clearContainerChildren("dynamic-container");
-    renderChips("dynamic-result", "Cleared all elements using innerHTML = ''", true);
-}
-
-function updateElementCountDisplay() {
-    const container = document.getElementById("dynamic-container");
-    const count = container ? container.children.length : 0;
-    renderChips("dynamic-result", `Current elements count: ${count}`, true);
-}
-
-// --- Handler 4: Attributes ---
-function handleToggleInputType() {
-    const newType = toggleInputAttributeType("attr-input-demo");
-    const btn = document.getElementById("btn-toggle-type");
-    if (btn) {
-        btn.textContent = newType === "password" ? "Show as Text" : "Hide as Password";
-    }
-    renderChips("attr-result", [
-        `setAttribute("type", "${newType}")`,
-        `Current type: ${newType}`
-    ], true);
-}
-
-function handlePlaceholderChange() {
-    const placeholders = [
-        "Enter your secret code...",
-        "Type something cool here...",
-        "JavaScript is amazing!",
-        "100 Days Frontend Challenge"
-    ];
-    const randomChoice = placeholders[Math.floor(Math.random() * placeholders.length)];
-    changePlaceholderAttribute("attr-input-demo", randomChoice);
-
-    renderChips("attr-result", [
-        `setAttribute("placeholder", "${randomChoice}")`,
-        `Updated successfully! 🏷️`
-    ], true);
-}
-
-// --- Handler 5: Event Listeners (Click & Real-time Input) ---
-let clickCounter = 0;
-
-function setupEventListeners() {
-    // 1. Click Listener
-    const clickBtn = document.getElementById("btn-click-tracker");
-    if (clickBtn) {
-        clickBtn.addEventListener("click", () => {
-            clickCounter++;
-            const counterBadge = document.getElementById("click-counter-display");
-            if (counterBadge) {
-                counterBadge.textContent = `${clickCounter} clicks`;
+/**
+ * Creates a Promise that simulates an asynchronous operation.
+ */
+function createSimulatedPromise(mode) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (mode === "success") {
+                resolve({ status: 200, message: "User data successfully retrieved from server! 📦" });
+            } else if (mode === "error") {
+                reject(new Error("Database connection timeout (504 Gateway Timeout) 💥"));
+            } else {
+                // Random 50/50
+                const isLucky = Math.random() >= 0.5;
+                if (isLucky) {
+                    resolve({ status: 200, message: "Random coin toss resulted in SUCCESS! 🪙✅" });
+                } else {
+                    reject(new Error("Random coin toss resulted in FAILURE! 🪙❌"));
+                }
             }
-            renderChips("events-result", [
-                `Event: "click"`,
-                `Total clicks: ${clickCounter} 🖱️`
-            ], true);
-        });
-    }
+        }, 1200);
+    });
+}
 
-    // 2. Real-time Input Listener
-    const liveInput = document.getElementById("live-mirror-input");
-    const liveOutput = document.getElementById("live-mirror-output");
+/**
+ * Demonstrates Promise lifecycle (.then, .catch, .finally).
+ */
+function handlePromiseDemo(mode) {
+    const badge = document.getElementById("promise-badge");
+    const details = document.getElementById("promise-details");
+    const result = document.getElementById("promise-result");
 
-    if (liveInput && liveOutput) {
-        liveInput.addEventListener("input", (e) => {
-            const val = e.target.value;
-            liveOutput.textContent = val.length > 0 ? val : "(Waiting for input...)";
-            renderChips("events-result", [
-                `Event: "input"`,
-                `Characters: ${val.length}`,
-                `Live Value: "${val}"`
-            ], true);
+    // 1. Initial State: PENDING
+    badge.className = "badge-status badge-pending";
+    badge.textContent = "PENDING ⏳";
+    details.innerHTML = `Promise is currently pending... Waiting for resolution (1200ms).`;
+    result.textContent = "Promise pending: neither fulfilled nor rejected yet.";
+
+    const promise = createSimulatedPromise(mode);
+
+    promise
+        // 2. FULFILLED State
+        .then((data) => {
+            badge.className = "badge-status badge-fulfilled";
+            badge.textContent = "FULFILLED ✅";
+            details.innerHTML = `<strong>Result:</strong> ${data.message} (HTTP ${data.status})`;
+        })
+        // 3. REJECTED State
+        .catch((error) => {
+            badge.className = "badge-status badge-rejected";
+            badge.textContent = "REJECTED ❌";
+            details.innerHTML = `<strong>Error Caught:</strong> ${error.message}`;
+        })
+        // 4. FINALLY (Always runs regardless of outcome)
+        .finally(() => {
+            const time = new Date().toLocaleTimeString();
+            result.innerHTML = `<code>.finally()</code> executed at <strong>${time}</strong> (cleanup complete).`;
         });
+}
+
+// ------------------------------------------------------
+// 4. ASYNC / AWAIT with try...catch
+// ------------------------------------------------------
+
+/**
+ * Helper that simulates asynchronous API fetch using Promise.
+ */
+function mockApiFetchUser(shouldFail) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (shouldFail) {
+                reject(new Error("Failed to load user: Network connection lost (404)"));
+            } else {
+                resolve({
+                    id: 26,
+                    username: "harish-0987",
+                    fullName: "Harish Peddapelly",
+                    role: "Frontend Developer",
+                    challenge: "100 Days Frontend"
+                });
+            }
+        }, 1200);
+    });
+}
+
+/**
+ * Asynchronous function using async/await and try-catch-finally.
+ */
+async function handleAsyncAwaitDemo(shouldFail) {
+    const badge = document.getElementById("async-badge");
+    const details = document.getElementById("async-details");
+    const result = document.getElementById("async-result");
+
+    badge.className = "badge-status badge-pending";
+    badge.textContent = "AWAITING ⏳";
+    details.textContent = "Executing async function... Waiting on 'await' keyword.";
+    result.textContent = "Execution paused at await mockApiFetchUser()...";
+
+    try {
+        // Pauses execution of this async function until promise settles
+        const user = await mockApiFetchUser(shouldFail);
+
+        badge.className = "badge-status badge-success";
+        badge.textContent = "SUCCESS ✅";
+        details.innerHTML = `
+            <div><strong>User ID:</strong> #${user.id}</div>
+            <div><strong>Name:</strong> ${user.fullName} (@${user.username})</div>
+            <div><strong>Role:</strong> ${user.role} • <em>${user.challenge}</em></div>
+        `;
+        result.textContent = "async function resolved successfully without throwing.";
+    } catch (error) {
+        // Catches any rejected promises or runtime exceptions
+        badge.className = "badge-status badge-error";
+        badge.textContent = "CAUGHT ❌";
+        details.innerHTML = `<strong>catch block triggered:</strong> ${error.message}`;
+        result.textContent = "Error caught gracefully by try...catch block.";
+    } finally {
+        // Always executes
+        console.log("async/await demonstration completed.");
     }
 }
 
 // ------------------------------------------------------
-// Initial triggers on DOM content loaded
+// 5. FETCH API: Real-world HTTP Requests
 // ------------------------------------------------------
-window.addEventListener("DOMContentLoaded", () => {
-    // Pre-populate initial dynamic chips
-    createAndAppendChip("dynamic-container", "Explore DOM");
-    createAndAppendChip("dynamic-container", "Modify Nodes");
 
-    setupEventListeners();
-    handleTextContentChange();
-    handleStyleColor("#38bdf8", "rgba(56, 189, 248, 0.12)");
-});
+/**
+ * Fetches a random quote from public API with graceful fallback.
+ */
+async function handleFetchQuote() {
+    const badge = document.getElementById("fetch-badge");
+    const details = document.getElementById("fetch-details");
+    const result = document.getElementById("fetch-result");
+    const btn = document.getElementById("btn-fetch-quote");
+
+    btn.disabled = true;
+    badge.className = "badge-status badge-pending";
+    badge.textContent = "FETCHING ⏳";
+    details.textContent = "Sending HTTP GET request to API...";
+
+    const startTime = performance.now();
+
+    try {
+        // Using real public API with fallback
+        const response = await fetch("https://dummyjson.com/quotes/random");
+        
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const duration = (performance.now() - startTime).toFixed(0);
+
+        badge.className = "badge-status badge-success";
+        badge.textContent = "200 OK ✅";
+        details.innerHTML = `
+            <blockquote style="font-style: italic; color: #f3f4f6; margin-bottom: 6px;">"${data.quote}"</blockquote>
+            <div style="color: #9ca3af; font-size: 0.82rem;">— ${data.author}</div>
+        `;
+        result.innerHTML = `Data fetched in <strong>${duration}ms</strong> via <code>fetch()</code> & <code>response.json()</code>`;
+    } catch (err) {
+        // Offline / CORS fallback for reliable demo experience
+        const duration = (performance.now() - startTime).toFixed(0);
+        badge.className = "badge-status badge-success";
+        badge.textContent = "DEMO DATA ✅";
+        details.innerHTML = `
+            <blockquote style="font-style: italic; color: #f3f4f6; margin-bottom: 6px;">"First, solve the problem. Then, write the code."</blockquote>
+            <div style="color: #9ca3af; font-size: 0.82rem;">— John Johnson (Offline Fallback)</div>
+        `;
+        result.innerHTML = `Simulated response in <strong>${duration}ms</strong> (Network error: ${err.message})`;
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+/**
+ * Fetches a sample Todo item from jsonplaceholder.
+ */
+async function handleFetchTodo() {
+    const badge = document.getElementById("fetch-badge");
+    const details = document.getElementById("fetch-details");
+    const result = document.getElementById("fetch-result");
+    const btn = document.getElementById("btn-fetch-todo");
+
+    btn.disabled = true;
+    badge.className = "badge-status badge-pending";
+    badge.textContent = "FETCHING ⏳";
+    details.textContent = "Fetching todo from jsonplaceholder.typicode.com...";
+
+    const startTime = performance.now();
+
+    try {
+        const response = await fetch("https://jsonplaceholder.typicode.com/todos/1");
+        
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const todo = await response.json();
+        const duration = (performance.now() - startTime).toFixed(0);
+
+        badge.className = "badge-status badge-success";
+        badge.textContent = "200 OK ✅";
+        details.innerHTML = `
+            <div><strong>Todo #${todo.id}:</strong> ${todo.title}</div>
+            <div><strong>Status:</strong> ${todo.completed ? "Completed ✅" : "In Progress ⏳"}</div>
+        `;
+        result.innerHTML = `Todo retrieved in <strong>${duration}ms</strong>.`;
+    } catch (err) {
+        const duration = (performance.now() - startTime).toFixed(0);
+        badge.className = "badge-status badge-success";
+        badge.textContent = "DEMO TODO ✅";
+        details.innerHTML = `
+            <div><strong>Todo #1:</strong> Master Asynchronous JavaScript</div>
+            <div><strong>Status:</strong> In Progress ⏳ (Demo Mode)</div>
+        `;
+        result.innerHTML = `Simulated response in <strong>${duration}ms</strong>.`;
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+// ------------------------------------------------------
+// 6. EVENT LOOP: Execution Order Demonstration
+// ------------------------------------------------------
+
+/**
+ * Appends a log line to the interactive terminal.
+ */
+function logToTerminal(tagType, tagText, message) {
+    const terminal = document.getElementById("terminal-output");
+    if (!terminal) return;
+
+    const line = document.createElement("div");
+    line.className = "terminal-line";
+
+    const tag = document.createElement("span");
+    tag.className = tagType;
+    tag.textContent = tagText;
+
+    const text = document.createElement("span");
+    text.textContent = message;
+
+    line.appendChild(tag);
+    line.appendChild(text);
+    terminal.appendChild(line);
+
+    terminal.scrollTop = terminal.scrollHeight;
+}
+
+/**
+ * Clears terminal messages.
+ */
+function handleClearTerminal() {
+    const terminal = document.getElementById("terminal-output");
+    if (terminal) {
+        terminal.innerHTML = `<div class="terminal-line"><span class="tag-meta">[SYSTEM]</span> Terminal cleared. Ready for next race.</div>`;
+    }
+}
+
+/**
+ * Demonstrates the Event Loop priority:
+ * 1. Synchronous code (Call Stack)
+ * 2. Microtasks (Promise.then)
+ * 3. Macrotasks (setTimeout)
+ */
+function handleRunEventLoopRace() {
+    const btn = document.getElementById("btn-run-race");
+    btn.disabled = true;
+
+    handleClearTerminal();
+
+    logToTerminal("tag-meta", "[START]", "Starting Event Loop race...");
+
+    // 1. Synchronous log 1
+    logToTerminal("tag-sync", "[1. SYNC]", "Immediate synchronous execution (Call Stack start)");
+
+    // 2. Macrotask (setTimeout with 0ms delay)
+    setTimeout(() => {
+        logToTerminal("tag-macro", "[4. MACROTASK]", "setTimeout callback executed from Macrotask Queue (0ms delay)");
+        btn.disabled = false;
+    }, 0);
+
+    // 3. Microtask (Promise resolution)
+    Promise.resolve().then(() => {
+        logToTerminal("tag-micro", "[3. MICROTASK]", "Promise .then() callback executed from Microtask Queue");
+    });
+
+    // 4. Synchronous log 2
+    logToTerminal("tag-sync", "[2. SYNC]", "Immediate synchronous execution (Call Stack end)");
+}
