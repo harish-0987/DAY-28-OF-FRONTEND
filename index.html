@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Day 27 of Frontend: React.js Fundamentals (What is React, Functional Components, JSX, Props, and useState) with minimal code.">
+    <meta name="description" content="Day 28 of Frontend: React Hooks (useEffect), Event Handling, Lists & Keys, and Controlled Forms (Basic Level).">
     <meta name="author" content="Harish (harish-0987)">
-    <title>Day 27 - React.js Fundamentals | Harish</title>
+    <title>Day 28 - React Hooks, Events, Lists & Forms | Harish</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,220 +20,208 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <div class="badge">Day 27 of 100 Days Frontend</div>
-            <h1>React.js <span class="highlight">Fundamentals</span></h1>
-            <p class="subtitle">A concise, beginner-friendly introduction to <strong>What is React</strong>, <strong>Functional Components</strong>, <strong>JSX</strong>, <strong>Props</strong>, and <strong>State (<code>useState</code>)</strong> with minimal code.</p>
+            <div class="badge">Day 28 of 100 Days Frontend</div>
+            <h1>React <span class="highlight">Hooks, Events, Lists &amp; Forms</span></h1>
+            <p class="subtitle">A clean, beginner-friendly exploration of <strong><code>useEffect</code></strong>, <strong>Event Handling</strong>, <strong>Lists with <code>key</code> props</strong>, and <strong>Controlled Form Components</strong>.</p>
         </header>
 
         <!-- Interactive Playground Grid -->
         <main class="grid">
 
-            <!-- Card 1: What is React.js? -->
-            <section class="card" id="card-what-is-react">
+            <!-- Card 1: React Hook (useEffect) -->
+            <section class="card" id="card-use-effect">
                 <div class="card-header">
                     <div class="card-header-row">
-                        <span class="card-tag">1. What is React.js?</span>
+                        <span class="card-tag">1. React Hooks</span>
                         <span class="priority-pill">⭐⭐⭐ Priority</span>
                     </div>
-                    <h2>Declarative &amp; Virtual DOM</h2>
+                    <h2>useEffect (Side Effects &amp; Lifecycle)</h2>
                 </div>
-                <p class="card-desc">React updates the UI efficiently using an in-memory Virtual DOM to calculate diffs and touch only changed elements.</p>
+                <p class="card-desc">Runs operations like timers, data fetching, or event subscriptions. Returns a cleanup function when unmounting.</p>
                 
                 <div class="card-body">
-                    <label>Virtual DOM Diffing Simulation:</label>
-                    <div class="vdom-grid">
-                        <div class="vdom-box">
-                            <div class="vdom-box-title">
-                                <span>Static Nodes</span>
-                                <span style="color: #9ca3af;">(Untouched)</span>
-                            </div>
-                            <div class="vdom-node">&lt;Header /&gt;</div>
-                            <div class="vdom-node">&lt;Sidebar /&gt;</div>
+                    <div class="hook-display">
+                        <div>
+                            <span style="font-size: 0.78rem; text-transform: uppercase; color: #9ca3af; font-weight: 700;">Elapsed Timer</span>
+                            <div class="hook-timer-value" id="effect-timer-display">0s</div>
                         </div>
-                        <div class="vdom-box">
-                            <div class="vdom-box-title">
-                                <span>Dynamic Node</span>
-                                <span style="color: #61dafb;">(Diffed)</span>
-                            </div>
-                            <div class="vdom-node updated" id="vdom-time-node">Timestamp: Ready</div>
+                        <div class="btn-group" style="margin-bottom: 0;">
+                            <button id="btn-toggle-effect" onclick="toggleTimerEffect()">Mount Effect (Start Timer)</button>
+                            <button class="btn-secondary" onclick="resetTimerEffect()">Reset</button>
                         </div>
                     </div>
 
-                    <div class="btn-group">
-                        <button onclick="simulateVDOMUpdate()">Trigger V-DOM Diff</button>
-                    </div>
-
-                    <div class="result-box chips-wrap" id="vdom-result-chips">
-                        <span class="step-chip">Ready to simulate React reconciliation</span>
+                    <div class="result-box chips-wrap" id="effect-chips">
+                        <span class="step-chip">Click button to mount useEffect</span>
                     </div>
                 </div>
 
                 <div class="code-preview">
-<pre><code>// React: Declarative UI rendering
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(&lt;App /&gt;);</code></pre>
+<pre><code>useEffect(() => {
+  const timer = setInterval(() => setTime(t => t + 1), 1000);
+  return () => clearInterval(timer); // Cleanup on unmount
+}, []); // Empty deps = run once on mount</code></pre>
                 </div>
             </section>
 
-            <!-- Card 2: Functional Components -->
-            <section class="card" id="card-components">
+            <!-- Card 2: Event Handling -->
+            <section class="card" id="card-events">
                 <div class="card-header">
                     <div class="card-header-row">
-                        <span class="card-tag">2. Functional Components</span>
+                        <span class="card-tag">2. Event Handling</span>
                         <span class="priority-pill">⭐⭐⭐ Priority</span>
                     </div>
-                    <h2>Reusable UI Building Blocks</h2>
+                    <h2>Synthetic Events &amp; Arguments</h2>
                 </div>
-                <p class="card-desc">A functional component is simply a JavaScript function returning JSX markup. Capitalized names distinguish them from HTML tags.</p>
+                <p class="card-desc">React uses camelCase event handlers. Use arrow functions to pass custom parameters without invoking immediately.</p>
                 
                 <div class="card-body">
-                    <label>Rendered Component Output:</label>
-                    <div id="component-render-target" style="margin-bottom: 12px;"></div>
-
+                    <label>Interactive Button Triggers:</label>
                     <div class="btn-group">
-                        <button onclick="renderFunctionalComponent()">Re-render Component</button>
+                        <button onclick="handleButtonClick('React is Awesome! 🚀', event)">Pass Argument 1</button>
+                        <button class="btn-secondary" onclick="handleButtonClick('Frontend Day 28 ⚛️', event)">Pass Argument 2</button>
+                        <button class="btn-warning" onclick="handleButtonClick('Custom Action Triggered ⚡', event)">Pass Argument 3</button>
                     </div>
 
-                    <div class="result-box chips-wrap">
-                        <span class="step-chip">Function returns UI</span>
-                        <span class="step-chip">100% Reusable</span>
+                    <label style="margin-top: 10px;">Event Inspection Result:</label>
+                    <div class="result-box chips-wrap" id="event-result-chips">
+                        <span class="step-chip">Waiting for event interaction...</span>
                     </div>
                 </div>
 
                 <div class="code-preview">
-<pre><code>// Functional Component (Few lines of code!)
-function WelcomeCard() {
-  return &lt;h2&gt;Welcome to Day 27! 🚀&lt;/h2&gt;;
-}
-
-// Usage: &lt;WelcomeCard /&gt;</code></pre>
+<pre><code>// Passing arguments with arrow function:
+&lt;button onClick={() => handleClick("React ⚛️")}&gt;
+  Pass Parameter
+&lt;/button&gt;</code></pre>
                 </div>
             </section>
 
-            <!-- Card 3: JSX (JavaScript XML) -->
-            <section class="card" id="card-jsx">
+            <!-- Card 3: Lists & Keys -->
+            <section class="card" id="card-lists">
                 <div class="card-header">
                     <div class="card-header-row">
-                        <span class="card-tag">3. JSX (JavaScript XML)</span>
+                        <span class="card-tag">3. Lists &amp; Keys</span>
                         <span class="priority-pill">⭐⭐⭐ Priority</span>
                     </div>
-                    <h2>HTML Syntax in JavaScript</h2>
+                    <h2>Rendering with .map() &amp; key</h2>
                 </div>
-                <p class="card-desc">Write HTML-like tags with dynamic JavaScript expressions embedded inside curly braces <code>{}</code>.</p>
+                <p class="card-desc">Transform arrays into JSX using <code>.map()</code>. The <code>key</code> prop helps React identify modified or removed items efficiently.</p>
                 
                 <div class="card-body">
                     <div class="input-row">
                         <div class="input-col">
-                            <label for="jsx-name-input">Name Expression</label>
-                            <input type="text" id="jsx-name-input" value="Harish" oninput="evaluateJSXExpression()">
+                            <label for="list-item-name">Item Name</label>
+                            <input type="text" id="list-item-name" placeholder="e.g. Next.js">
                         </div>
                         <div class="input-col">
-                            <label for="jsx-num1">Number 1</label>
-                            <input type="number" id="jsx-num1" value="5" oninput="evaluateJSXExpression()">
-                        </div>
-                        <div class="input-col">
-                            <label for="jsx-num2">Number 2</label>
-                            <input type="number" id="jsx-num2" value="8" oninput="evaluateJSXExpression()">
+                            <label for="list-item-category">Category</label>
+                            <input type="text" id="list-item-category" placeholder="e.g. Framework">
                         </div>
                     </div>
 
-                    <label>Live Evaluated JSX <code>{}</code> Expressions:</label>
-                    <div class="target-box" id="jsx-preview-output"></div>
+                    <div class="btn-group">
+                        <button onclick="handleAddListItem()">Add Item to List</button>
+                    </div>
+
+                    <label style="margin-top: 8px;">Keyed Element Render Canvas:</label>
+                    <div class="key-list" id="keyed-list-container"></div>
+
+                    <div class="result-box chips-wrap" id="list-chips">
+                        <span class="step-chip">List initialized with unique keys</span>
+                    </div>
                 </div>
 
                 <div class="code-preview">
-<pre><code>// Dynamic JSX Expressions using {}
-const name = "Harish";
-const greeting = &lt;h3&gt;Hello, {name.toUpperCase()}!&lt;/h3&gt;;
-const math = &lt;p&gt;Calculation: {5 * 8}&lt;/p&gt;;</code></pre>
+<pre><code>// Render array with map and key prop:
+{items.map(item => (
+  &lt;li key={item.id}&gt;{item.name}&lt;/li&gt;
+))}</code></pre>
                 </div>
             </section>
 
-            <!-- Card 4: Props -->
-            <section class="card" id="card-props">
+            <!-- Card 4: Forms & Controlled Components -->
+            <section class="card" id="card-forms">
                 <div class="card-header">
                     <div class="card-header-row">
-                        <span class="card-tag">4. Component Props</span>
+                        <span class="card-tag">4. Controlled Forms</span>
                         <span class="priority-pill">⭐⭐⭐ Priority</span>
                     </div>
-                    <h2>Passing Data (Parent ➔ Child)</h2>
+                    <h2>value + onChange + e.preventDefault()</h2>
                 </div>
-                <p class="card-desc">Props are read-only properties passed down to configure child components, just like function arguments.</p>
+                <p class="card-desc">Controlled components sync user inputs with React state. Form submission stops reload with <code>e.preventDefault()</code>.</p>
                 
                 <div class="card-body">
-                    <div class="input-row">
-                        <div class="input-col">
-                            <label for="prop-name">prop: name</label>
-                            <input type="text" id="prop-name" value="Harish" oninput="handlePropsUpdate()">
+                    <form onsubmit="handleControlledFormSubmit(event)">
+                        <div class="input-row">
+                            <div class="input-col">
+                                <label for="form-username">Username</label>
+                                <input type="text" id="form-username" value="Harish" oninput="handleFormInputChange('username', this.value)">
+                            </div>
+                            <div class="input-col">
+                                <label for="form-role">Role</label>
+                                <input type="text" id="form-role" value="Frontend Developer" oninput="handleFormInputChange('role', this.value)">
+                            </div>
                         </div>
-                        <div class="input-col">
-                            <label for="prop-role">prop: role</label>
-                            <input type="text" id="prop-role" value="Frontend Developer" oninput="handlePropsUpdate()">
-                        </div>
-                        <div class="input-col">
-                            <label for="prop-badge">prop: badge</label>
-                            <input type="text" id="prop-badge" value="Day 27" oninput="handlePropsUpdate()">
-                        </div>
-                    </div>
 
-                    <label>Rendered Child Component with Props:</label>
-                    <div id="props-render-target"></div>
-                </div>
-
-                <div class="code-preview">
-<pre><code>// Child Component accepting props
-function UserCard(props) {
-  return &lt;h3&gt;{props.name} - {props.role}&lt;/h3&gt;;
-}
-// Parent passes props: &lt;UserCard name="Harish" role="Dev" /&gt;</code></pre>
-                </div>
-            </section>
-
-            <!-- Card 5: State (useState) -->
-            <section class="card" id="card-state" style="grid-column: 1 / -1;">
-                <div class="card-header">
-                    <div class="card-header-row">
-                        <span class="card-tag">5. State (useState Hook)</span>
-                        <span class="priority-pill">⭐⭐⭐ Priority</span>
-                    </div>
-                    <h2>Component Memory &amp; Reactivity</h2>
-                </div>
-                <p class="card-desc">State represents internal dynamic data. When state updates via its setter function, React automatically re-renders the UI.</p>
-                
-                <div class="card-body">
-                    <div class="counter-ui">
-                        <div class="counter-value-wrap">
-                            <span class="counter-label">State Variable (count)</span>
-                            <span class="counter-number" id="state-counter-number">0</span>
-                        </div>
                         <div class="btn-group">
-                            <button onclick="updateCounter(1)">+ Increment</button>
-                            <button class="btn-secondary" onclick="updateCounter(-1)">- Decrement</button>
-                            <button class="btn-warning" onclick="updateCounter(null, true)">Reset</button>
+                            <button type="submit">Submit Form (e.preventDefault)</button>
                         </div>
-                    </div>
+                    </form>
 
-                    <div class="result-box chips-wrap" id="state-result-chips">
-                        <span class="step-chip">Current state: 0</span>
-                        <span class="step-chip">Click a button to update state</span>
+                    <label style="margin-top: 8px;">Live React State (Single Source of Truth):</label>
+                    <pre class="form-state-preview" id="form-state-json">{}</pre>
+
+                    <div class="result-box chips-wrap" id="form-result-chips">
+                        <span class="step-chip">Type in inputs to see two-way state binding</span>
                     </div>
                 </div>
 
                 <div class="code-preview">
-<pre><code>import React, { useState } from 'react';
+<pre><code>const handleSubmit = (e) => {
+  e.preventDefault(); // Stop default browser reload
+  console.log("Form State:", formData);
+};</code></pre>
+                </div>
+            </section>
 
-function Counter() {
-  const [count, setCount] = useState(0);
+            <!-- Card 5: Core React Summary -->
+            <section class="card" id="card-summary" style="grid-column: 1 / -1;">
+                <div class="card-header">
+                    <div class="card-header-row">
+                        <span class="card-tag">5. Summary Reference</span>
+                        <span class="priority-pill">⭐⭐⭐ Priority</span>
+                    </div>
+                    <h2>React Architecture Quick Checklist</h2>
+                </div>
+                <p class="card-desc">Understanding how Hooks, Events, Lists, and Controlled Forms work together creates modern, reactive, scalable web applications.</p>
+                
+                <div class="card-body">
+                    <div class="input-row" style="flex-wrap: wrap;">
+                        <div class="input-col" style="min-width: 220px;">
+                            <label>⚛️ useEffect</label>
+                            <p style="font-size: 0.85rem; color: #9ca3af;">Manages side effects &amp; cleanup. Controlled via the dependency array.</p>
+                        </div>
+                        <div class="input-col" style="min-width: 220px;">
+                            <label>⚡ Event Handling</label>
+                            <p style="font-size: 0.85rem; color: #9ca3af;">Synthetic cross-browser events. Arrow functions pass arguments cleanly.</p>
+                        </div>
+                        <div class="input-col" style="min-width: 220px;">
+                            <label>🔑 Lists &amp; Keys</label>
+                            <p style="font-size: 0.85rem; color: #9ca3af;">Keys provide persistent identity so React diffs collections without extra work.</p>
+                        </div>
+                        <div class="input-col" style="min-width: 220px;">
+                            <label>📝 Controlled Forms</label>
+                            <p style="font-size: 0.85rem; color: #9ca3af;">React state drives UI inputs; <code>e.preventDefault()</code> prevents full reloads.</p>
+                        </div>
+                    </div>
+                </div>
 
-  return (
-    &lt;div&gt;
-      &lt;h3&gt;Count: {count}&lt;/h3&gt;
-      &lt;button onClick={() =&gt; setCount(count + 1)}&gt;+ Increment&lt;/button&gt;
-      &lt;button onClick={() =&gt; setCount(count - 1)}&gt;- Decrement&lt;/button&gt;
-      &lt;button onClick={() =&gt; setCount(0)}&gt;Reset&lt;/button&gt;
-    &lt;/div&gt;
-  );
-}</code></pre>
+                <div class="code-preview">
+<pre><code>// Day 28 Complete Pattern:
+const [items, setItems] = useState([]);
+useEffect(() => { /* fetch on mount */ }, []);
+return &lt;form onSubmit={add}&gt;&lt;input onChange={update} /&gt;&lt;/form&gt;;</code></pre>
                 </div>
             </section>
 
@@ -241,8 +229,8 @@ function Counter() {
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Day 27 of 100 Days Frontend • Built by <a href="https://github.com/harish-0987" target="_blank" rel="noopener">Harish</a></p>
-            <p><a href="https://github.com/harish-0987/DAY-27-OF-FRONTEND" target="_blank" rel="noopener" class="repo-link">View on GitHub ↗</a></p>
+            <p>Day 28 of 100 Days Frontend • Built by <a href="https://github.com/harish-0987" target="_blank" rel="noopener">Harish</a></p>
+            <p><a href="https://github.com/harish-0987/DAY-28-OF-FRONTEND" target="_blank" rel="noopener" class="repo-link">View on GitHub ↗</a></p>
         </footer>
     </div>
 

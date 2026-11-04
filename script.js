@@ -1,129 +1,177 @@
 // ======================================================
-// Day 27: React.js Fundamentals (Basic Level)
+// Day 28: React Hooks, Event Handling, Lists & Forms
 // 100 Days Frontend Challenge by Harish (@harish-0987)
 // ======================================================
 
 // ------------------------------------------------------
-// 1. WHAT IS REACT: Virtual DOM Diffing Simulator
+// 1. REACT HOOK: useEffect (Lifecycle & Side Effects)
 // ------------------------------------------------------
-// React creates an in-memory Virtual DOM. When data changes,
-// it computes the diff and updates ONLY the modified node.
-function simulateVDOMUpdate() {
-    const timeString = new Date().toLocaleTimeString();
-    const target = document.getElementById("vdom-time-node");
-    const chipsTarget = document.getElementById("vdom-result-chips");
+let timerCount = 0;
+let timerInterval = null;
+let isTimerActive = false;
 
-    if (target) {
-        target.textContent = `Timestamp: ${timeString}`;
-        target.classList.add("updated");
-        setTimeout(() => target.classList.remove("updated"), 500);
+// Simulating useEffect(() => { ... return () => cleanup; }, [])
+function toggleTimerEffect() {
+    const btn = document.getElementById("btn-toggle-effect");
+    const display = document.getElementById("effect-timer-display");
+    const chips = document.getElementById("effect-chips");
+
+    if (!isTimerActive) {
+        // Mount Effect: Set up interval
+        isTimerActive = true;
+        btn.textContent = "Unmount Effect (Cleanup)";
+        btn.className = "btn-warning";
+
+        timerInterval = setInterval(() => {
+            timerCount++;
+            if (display) display.textContent = `${timerCount}s`;
+        }, 1000);
+
+        if (chips) {
+            chips.innerHTML = `
+                <span class="step-chip">useEffect mounted 🟢</span>
+                <span class="step-chip">Dependency: [] (runs on mount)</span>
+            `;
+        }
+    } else {
+        // Cleanup Effect: Clear interval (return () => clearInterval)
+        isTimerActive = false;
+        clearInterval(timerInterval);
+        btn.textContent = "Mount Effect (Start Timer)";
+        btn.className = "";
+
+        if (chips) {
+            chips.innerHTML = `
+                <span class="step-chip">Cleanup executed 🛑 (clearInterval)</span>
+                <span class="step-chip">Component unmounted</span>
+            `;
+        }
+    }
+}
+
+function resetTimerEffect() {
+    if (timerInterval) clearInterval(timerInterval);
+    isTimerActive = false;
+    timerCount = 0;
+    const display = document.getElementById("effect-timer-display");
+    const btn = document.getElementById("btn-toggle-effect");
+    if (display) display.textContent = "0s";
+    if (btn) {
+        btn.textContent = "Mount Effect (Start Timer)";
+        btn.className = "";
+    }
+}
+
+// ------------------------------------------------------
+// 2. EVENT HANDLING (Synthetic Events & Arguments)
+// ------------------------------------------------------
+function handleButtonClick(message, event) {
+    const output = document.getElementById("event-result-chips");
+    if (!output) return;
+
+    output.innerHTML = `
+        <span class="step-chip">Message: "${message}"</span>
+        <span class="step-chip">e.type: "${event ? event.type : 'click'}"</span>
+        <span class="step-chip">Syntax: onClick={() => fn(arg)} ✅</span>
+    `;
+}
+
+// ------------------------------------------------------
+// 3. LISTS & KEYS (array.map with unique key prop)
+// ------------------------------------------------------
+let techList = [
+    { id: 101, name: "React.js", category: "Library" },
+    { id: 102, name: "JavaScript", category: "Language" },
+    { id: 103, name: "HTML & CSS", category: "Markup & Styling" }
+];
+let nextId = 104;
+
+function renderKeyedList() {
+    const listContainer = document.getElementById("keyed-list-container");
+    if (!listContainer) return;
+
+    if (techList.length === 0) {
+        listContainer.innerHTML = '<div style="color: #9ca3af; padding: 12px; text-align: center;">List is empty. Add an item below!</div>';
+        return;
     }
 
-    if (chipsTarget) {
-        chipsTarget.innerHTML = `
-            <span class="step-chip">Diffing: 1 text node changed</span>
-            <span class="step-chip">Repainted: ${timeString}</span>
+    listContainer.innerHTML = techList.map(item => `
+        <div class="key-list-item" id="item-${item.id}">
+            <div>
+                <span class="key-badge">key="${item.id}"</span>
+                <strong>${item.name}</strong> 
+                <span style="color: #9ca3af; font-size: 0.8rem;">(${item.category})</span>
+            </div>
+            <button class="item-delete-btn" onclick="handleRemoveListItem(${item.id})">Delete ✕</button>
+        </div>
+    `).join("");
+}
+
+function handleAddListItem() {
+    const nameInput = document.getElementById("list-item-name");
+    const catInput = document.getElementById("list-item-category");
+
+    const name = nameInput ? nameInput.value.trim() : "";
+    const category = catInput ? catInput.value.trim() : "";
+
+    if (!name) return;
+
+    techList.push({ id: nextId++, name, category: category || "General" });
+    if (nameInput) nameInput.value = "";
+    renderKeyedList();
+
+    const chips = document.getElementById("list-chips");
+    if (chips) {
+        chips.innerHTML = `
+            <span class="step-chip">Added item with key="${nextId - 1}"</span>
+            <span class="step-chip">Total items: ${techList.length}</span>
+        `;
+    }
+}
+
+function handleRemoveListItem(id) {
+    techList = techList.filter(item => item.id !== id);
+    renderKeyedList();
+
+    const chips = document.getElementById("list-chips");
+    if (chips) {
+        chips.innerHTML = `
+            <span class="step-chip">Removed item key="${id}"</span>
+            <span class="step-chip">React efficiently updates only this DOM node</span>
         `;
     }
 }
 
 // ------------------------------------------------------
-// 2. FUNCTIONAL COMPONENT (Few Lines of Code)
+// 4. FORMS & CONTROLLED COMPONENTS (value + onChange + e.preventDefault)
 // ------------------------------------------------------
-// A functional component is a function returning UI markup.
-function HeaderComponent(props) {
-    return `
-        <div class="component-badge">
-            <span class="component-icon">⚛️</span>
-            <div>
-                <div class="component-title">${props.title}</div>
-                <div class="component-subtitle">${props.subtitle}</div>
-            </div>
-        </div>
-    `;
+const formState = {
+    username: "Harish",
+    role: "Frontend Developer",
+    email: "harish@example.com"
+};
+
+function handleFormInputChange(fieldName, value) {
+    formState[fieldName] = value;
+    updateFormJSONDisplay();
 }
 
-function renderFunctionalComponent() {
-    const container = document.getElementById("component-render-target");
-    if (container) {
-        container.innerHTML = HeaderComponent({
-            title: "HeaderComponent() Rendered",
-            subtitle: "A clean functional component returning UI in 5 lines."
-        });
+function updateFormJSONDisplay() {
+    const preview = document.getElementById("form-state-json");
+    if (preview) {
+        preview.textContent = JSON.stringify(formState, null, 2);
     }
 }
 
-// ------------------------------------------------------
-// 3. JSX: JavaScript XML Expressions ({})
-// ------------------------------------------------------
-// In JSX, wrap any dynamic JavaScript expression in curly braces {}.
-function evaluateJSXExpression() {
-    const nameInput = document.getElementById("jsx-name-input").value || "Harish";
-    const num1 = parseInt(document.getElementById("jsx-num1").value, 10) || 5;
-    const num2 = parseInt(document.getElementById("jsx-num2").value, 10) || 5;
+function handleControlledFormSubmit(event) {
+    if (event) event.preventDefault(); // Stop default browser page reload!
 
-    const output = document.getElementById("jsx-preview-output");
-    if (output) {
-        output.innerHTML = `
-            <div style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
-                <div>🔤 <strong>{name.toUpperCase()}:</strong> <span style="color: #61dafb;">${nameInput.toUpperCase()}</span></div>
-                <div>🔢 <strong>{${num1} * ${num2}}:</strong> <span style="color: #10b981;">${num1 * num2}</span></div>
-            </div>
-        `;
-    }
-}
-
-// ------------------------------------------------------
-// 4. PROPS: Passing Data to Child Components
-// ------------------------------------------------------
-// Props are read-only properties passed from parent to child.
-function UserCardComponent(props) {
-    return `
-        <div class="component-badge">
-            <span class="component-icon">${props.emoji || "🚀"}</span>
-            <div>
-                <div class="component-title">${props.name} <span class="step-chip">${props.badge}</span></div>
-                <div class="component-subtitle">${props.role}</div>
-            </div>
-        </div>
-    `;
-}
-
-function handlePropsUpdate() {
-    const name = document.getElementById("prop-name").value || "Harish";
-    const role = document.getElementById("prop-role").value || "Frontend Developer";
-    const badge = document.getElementById("prop-badge").value || "Day 27";
-
-    const container = document.getElementById("props-render-target");
-    if (container) {
-        container.innerHTML = UserCardComponent({ name, role, badge, emoji: "⚛️" });
-    }
-}
-
-// ------------------------------------------------------
-// 5. STATE (useState): Component Memory & Reactivity
-// ------------------------------------------------------
-// State holds dynamic values; updating state re-renders the UI.
-let counterState = 0;
-
-function updateCounter(delta = null, reset = false) {
-    if (reset) {
-        counterState = 0;
-    } else if (delta !== null) {
-        counterState += delta;
-    }
-
-    const numberDisplay = document.getElementById("state-counter-number");
-    const chipsDisplay = document.getElementById("state-result-chips");
-
-    if (numberDisplay) {
-        numberDisplay.textContent = counterState;
-    }
-
-    if (chipsDisplay) {
-        chipsDisplay.innerHTML = `
-            <span class="step-chip">Current state: ${counterState}</span>
-            <span class="step-chip">Triggered UI re-render 🔄</span>
+    const chips = document.getElementById("form-result-chips");
+    if (chips) {
+        chips.innerHTML = `
+            <span class="step-chip">e.preventDefault() called 🛑</span>
+            <span class="step-chip">Submitted: "${formState.username}" (${formState.role})</span>
+            <span class="step-chip">Single Source of Truth: State ✅</span>
         `;
     }
 }
@@ -132,9 +180,7 @@ function updateCounter(delta = null, reset = false) {
 // Initial triggers on DOM load
 // ------------------------------------------------------
 window.addEventListener("DOMContentLoaded", () => {
-    renderFunctionalComponent();
-    evaluateJSXExpression();
-    handlePropsUpdate();
-    updateCounter(0);
-    simulateVDOMUpdate();
+    renderKeyedList();
+    updateFormJSONDisplay();
+    handleButtonClick("Initial Mount", null);
 });

@@ -1,5 +1,5 @@
 /* ======================================================
-   Day 27: React.js Fundamentals - Modern Stylesheet
+   Day 28: React Hooks, Events, Lists & Forms - Stylesheet
    100 Days Frontend Challenge by Harish (@harish-0987)
    ====================================================== */
 
@@ -71,7 +71,7 @@ body {
 }
 
 .highlight {
-    background: linear-gradient(135deg, #61dafb 0%, #818cf8 100%);
+    background: linear-gradient(135deg, #61dafb 0%, #a855f7 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -202,6 +202,7 @@ body {
 
 input[type="text"],
 input[type="number"],
+input[type="email"],
 select {
     width: 100%;
     background: #030712;
@@ -269,6 +270,13 @@ button:active {
     background: #dc2626;
 }
 
+.btn-success {
+    background: #059669;
+}
+.btn-success:hover {
+    background: #10b981;
+}
+
 /* Target Box / Render Canvas */
 .target-box {
     background: #030712;
@@ -276,110 +284,86 @@ button:active {
     border-radius: var(--radius-sm);
     padding: 14px;
     margin-bottom: 12px;
-    text-align: center;
     font-size: 0.92rem;
     font-weight: 500;
 }
 
-/* Live Component Box */
-.component-badge {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(97, 218, 251, 0.08);
-    border: 1px solid rgba(97, 218, 251, 0.25);
-    border-radius: var(--radius-md);
-    padding: 14px 18px;
-    text-align: left;
-}
-
-.component-icon {
-    font-size: 2rem;
-}
-
-.component-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--react-blue);
-}
-
-.component-subtitle {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-/* Counter UI for useState */
-.counter-ui {
+/* Hook Timer Badge */
+.hook-display {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #030712;
-    border: 1px solid #1f293d;
-    border-radius: var(--radius-md);
-    padding: 14px 20px;
-    margin-bottom: 12px;
-}
-
-.counter-value-wrap {
-    display: flex;
-    flex-direction: column;
-}
-
-.counter-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    letter-spacing: 0.5px;
-    font-weight: 700;
-}
-
-.counter-number {
-    font-size: 2.2rem;
-    font-weight: 800;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--react-blue);
-    line-height: 1.1;
-}
-
-/* Virtual DOM Comparison */
-.vdom-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-.vdom-box {
     background: #030712;
     border: 1px solid #1f2937;
     border-radius: var(--radius-sm);
-    padding: 10px;
-    font-size: 0.82rem;
+    padding: 12px 16px;
+    margin-bottom: 12px;
 }
 
-.vdom-box-title {
-    font-weight: 700;
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.vdom-node {
-    padding: 4px 8px;
-    border-radius: 4px;
-    background: #111827;
-    margin-bottom: 4px;
+.hook-timer-value {
+    font-size: 1.8rem;
+    font-weight: 800;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.78rem;
-    border: 1px solid transparent;
+    color: var(--react-blue);
 }
 
-.vdom-node.updated {
-    border-color: #61dafb;
-    background: rgba(97, 218, 251, 0.15);
-    color: #61dafb;
+/* List Items with Keys */
+.key-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.key-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #030712;
+    border: 1px solid #1f2937;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    animation: fadeIn 0.25s ease-out;
+}
+
+.key-badge {
+    display: inline-block;
+    background: rgba(97, 218, 251, 0.12);
+    border: 1px solid rgba(97, 218, 251, 0.25);
+    color: var(--react-blue);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 8px;
+}
+
+.item-delete-btn {
+    background: transparent;
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+}
+
+.item-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+/* Form JSON State View */
+.form-state-preview {
+    background: #030712;
+    border: 1px solid #1f2937;
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: #a5f3fc;
+    margin-bottom: 12px;
 }
 
 /* Result Box */
@@ -412,6 +396,11 @@ button:active {
     font-weight: 500;
     padding: 3px 8px;
     border-radius: 9999px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Code Preview */
